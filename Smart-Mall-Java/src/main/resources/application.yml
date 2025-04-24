@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: Smart-Mall-Java
+  datasource:
+    url: jdbc:mysql://112.124.51.119:3306/smart_mall?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&defaultAuthenticationPlugin=mysql_native_password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    password: Root@12345678
+    username: root
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
