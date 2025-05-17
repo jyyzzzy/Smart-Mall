@@ -5,13 +5,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 //用户信息
 public class User {
     private String userId;
-    private String userName;
+    private String username;
     private String password;
     private String role;
     private String phone;

@@ -16,25 +16,29 @@ import com.smartmall.service.UserService;
  * @date 2025-04-08
  */
 @Service
-public class UserServiceImpl implements UserService
-{
+public class UserServiceImpl implements UserService {
     @Autowired
     private UserMapper userMapper;
+
     @Override
-    public List<User> findAll(){
+    public List<User> findAll() {
         return userMapper.findAll();
     }
 
     /**
      * 查询用户 (User Table)
      *
-     * @param userId 用户 (User Table)主键
+     * @param user 用户 (User Table)主键
      * @return 用户 (User Table)
      */
     @Override
-    public User selectUserByUserId(String userId)
-    {
-        return userMapper.selectUserByUserId(userId);
+    public List<User> selectUserByUserName(User user) {
+        return userMapper.selectUserByUserName(user);
+    }
+
+    @Override
+    public List<User> selectUserByUserNameAndPassword(User user) {
+        return userMapper.selectUserByUserNameAndPassword(user);
     }
 
     /**
@@ -44,8 +48,7 @@ public class UserServiceImpl implements UserService
      * @return 用户 (User Table)
      */
     @Override
-    public List<User> selectUserList(User user)
-    {
+    public List<User> selectUserList(User user) {
         return userMapper.selectUserList(user);
     }
 
@@ -56,8 +59,7 @@ public class UserServiceImpl implements UserService
      * @return 结果
      */
     @Override
-    public int insertUser(User user)
-    {
+    public int insertUser(User user) {
         return userMapper.insertUser(user);
     }
 
@@ -68,8 +70,7 @@ public class UserServiceImpl implements UserService
      * @return 结果
      */
     @Override
-    public int updateUser(User user)
-    {
+    public int updateUser(User user) {
         return userMapper.updateUser(user);
     }
 
@@ -79,11 +80,11 @@ public class UserServiceImpl implements UserService
      * @param userIds 需要删除的用户 (User Table)主键
      * @return 结果
      */
-    @Override
+    /*@Override
     public int deleteUserByUserIds(String[] userIds)
     {
         return userMapper.deleteUserByUserIds(userIds);
-    }
+    }*/
 
     /**
      * 删除用户 (User Table)信息
@@ -92,8 +93,7 @@ public class UserServiceImpl implements UserService
      * @return 结果
      */
     @Override
-    public int deleteUserByUserId(String userId)
-    {
+    public int deleteUserByUserId(String userId) {
         return userMapper.deleteUserByUserId(userId);
     }
 }

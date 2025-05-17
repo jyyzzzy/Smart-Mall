@@ -6,17 +6,49 @@ import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
+/**
+ * 商场表 (Mall Table)实体类
+ *
+ * @author ccut_zzy
+ * @date 2025-05-14
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-//商场信息
 public class Mall {
+
+    /**
+     * 商场ID (Mall ID, UUID)
+     */
     private String mallId;
-    private String mallName;
+
+    /**
+     * 商场用户ID (User ID)
+     */
     private String userId;
-    private String location;
+
+    /**
+     * 商场名称 (Mall Name)
+     */
+    private String mallName;
+
+    /**
+     * 描述
+     */
+    private String description;
+
+    /**
+     * 地址
+     */
+    private String address;
+
+    /**
+     * 联系电话
+     */
     private String contactPhone;
+
+    /**
+     * 联系邮箱
+     */
     private String contactEmail;
-    private Date createdAt;
-    private Date updatedAt;
 }

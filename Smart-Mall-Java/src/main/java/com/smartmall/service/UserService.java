@@ -12,14 +12,17 @@ import java.util.List;
  * @date 2025-04-08
  */
 public interface UserService {
+    public List<User> findAll();
+
     /**
      * 查询用户 (User Table)
      *
-     * @param userId 用户 (User Table)主键
+     * @param user 用户 (User Table)主键
      * @return 用户 (User Table)
      */
-    public List<User> findAll();
-    public User selectUserByUserId(String userId);
+    public List<User> selectUserByUserName(User user);
+
+    public List<User> selectUserByUserNameAndPassword(User user);
 
     /**
      * 查询用户 (User Table)列表
@@ -51,7 +54,7 @@ public interface UserService {
      * @param userIds 需要删除的用户 (User Table)主键集合
      * @return 结果
      */
-    public int deleteUserByUserIds(String[] userIds);
+    //public int deleteUserByUserIds(String[] userIds);
 
     /**
      * 删除用户 (User Table)信息

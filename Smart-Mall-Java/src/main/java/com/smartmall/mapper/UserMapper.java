@@ -1,8 +1,7 @@
 package com.smartmall.mapper;
 
 import com.smartmall.domain.User;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -14,15 +13,34 @@ import java.util.List;
  */
 @Mapper
 public interface UserMapper {
-    @Select("select * from t_user")
+    @Select("select * from users")
     public List<User> findAll();
+
     /**
      * 查询用户 (User Table)
      *
-     * @param userId 用户 (User Table)主键
+     * @param user 用户 (User Table)主键
      * @return 用户 (User Table)
      */
-    public User selectUserByUserId(String userId);
+    @Select("""
+                        select user_id, username, password, role, phone, email, created_at, updated_at
+                        from users
+                        where username = #{username} and password = #{password};
+            """)
+    public List<User> selectUserByUserNameAndPassword(User user);
+
+    /**
+     * 查询用户 (User Table)
+     *
+     * @param user 用户 (User Table)主键
+     * @return 用户 (User Table)
+     */
+    @Select("""
+                        select user_id, username, password, role, phone, email, created_at, updated_at
+                        from users
+                        where username = #{username};
+            """)
+    public List<User> selectUserByUserName(User user);
 
     /**
      * 查询用户 (User Table)列表
@@ -30,6 +48,11 @@ public interface UserMapper {
      * @param user 用户 (User Table)
      * @return 用户 (User Table)集合
      */
+    @Select("""
+            select user_id, username, password, role, phone, email, created_at, updated_at
+            from users
+            where user_id = #{userId} or username = #{username} or password = #{password} or role = #{role};
+            """)
     public List<User> selectUserList(User user);
 
     /**
@@ -38,6 +61,10 @@ public interface UserMapper {
      * @param user 用户 (User Table)
      * @return 结果
      */
+    @Insert("""
+            INSERT INTO users (user_id, username, password, role, phone, email, created_at, updated_at)
+            VALUES (UUID(), #{username}, #{password}, #{role}, #{phone}, #{email}, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP());
+            """)
     public int insertUser(User user);
 
     /**
@@ -46,6 +73,11 @@ public interface UserMapper {
      * @param user 用户 (User Table)
      * @return 结果
      */
+    @Update("""
+            UPDATE users
+            SET username = #{username}, password = #{password},  role = #{role}, phone = #{phone}, email = #{email}, updated_at = CURRENT_TIMESTAMP
+            WHERE user_id = #{userId};
+            """)
     public int updateUser(User user);
 
     /**
@@ -54,6 +86,9 @@ public interface UserMapper {
      * @param userId 用户 (User Table)主键
      * @return 结果
      */
+    @Delete("""
+            DELETE FROM users where user_id = #{userId};
+            """)
     public int deleteUserByUserId(String userId);
 
     /**
@@ -62,5 +97,5 @@ public interface UserMapper {
      * @param userIds 需要删除的数据主键集合
      * @return 结果
      */
-    public int deleteUserByUserIds(String[] userIds);
+    //public int deleteUserByUserIds(String[] userIds);
 }
