@@ -1,9 +1,7 @@
 package com.smartmall.controller;
 
-import com.smartmall.domain.*;
-import com.smartmall.service.CustomerService;
-import com.smartmall.service.MallService;
-import com.smartmall.service.MerchantService;
+import com.smartmall.domain.User; // Assuming Result class is in com.smartmall.domain
+import com.smartmall.domain.Result; // Explicit import for Result
 import com.smartmall.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -11,86 +9,85 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequestMapping("/users") // Base path for user management
 public class UserController {
+
     @Autowired
     private UserService userService;
-    @Autowired
-    private MallService mallService;
-    @Autowired
-    private MerchantService merchantService;
-    @Autowired
-    private CustomerService customerService;
 
-    @RequestMapping("/find-all")
-    public Result list(@RequestBody User user) {
+    /**
+     * Retrieves a list of all users.
+     * (Corresponds to original /find-all)
+     */
+    @GetMapping
+    public Result getAllUsers() {
         List<User> userList = userService.findAll();
+        // Consider using a DTO that excludes sensitive information like passwords
         return Result.success(userList);
     }
 
-    @GetMapping("/user/login")
-    public Result login(User user) {
-        List<User> userList = userService.selectUserByUserNameAndPassword(user);
-        if (userList != null && !userList.isEmpty()) {
-            return Result.success(userList.getFirst());
-        } else {
-            return Result.error("error");
-        }
-    }
-
-    @GetMapping("/user")
-    public Result selectUserList(User user) {
-        List<User> userList = userService.selectUserList(user);
+    /**
+     * Searches for users based on provided criteria in the User object (mapped from query parameters).
+     * (Corresponds to original GET /user)
+     * Example: /users/search?username=john&role=customer
+     */
+    @GetMapping("/search")
+    public Result searchUsers(User filter) { // Spring populates 'filter' from query parameters
+        // The User object will have fields set if they are present in the query string.
+        // Be mindful of the UserMapper.selectUserList query which uses OR and includes password.
+        // Searching by password in GET query parameters is highly discouraged.
+        List<User> userList = userService.selectUserList(filter);
+        // Consider using a DTO
         return Result.success(userList);
     }
 
-    @PostMapping("/user")
-    public Result insertUser(@RequestBody User user) {
-        userService.insertUser(user);
-        return Result.success();
-    }
-
-    @PostMapping("/user/register")
-    public Result register(@RequestBody User user) {
-        List<User> userList = userService.selectUserByUserName(user);
-        if (userList.isEmpty()) {
-            userService.insertUser(user);
-            switch (user.getRole()) {
-                case "admin" -> {
-                }
-                case "mall" -> {
-                    Mall mall = new Mall();
-                    mall.setUserId(user.getUserId());
-                    mall.setMallName("Unnamed");
-                    mallService.insertMall(mall);
-                }
-                case "merchant" -> {
-                    Merchant merchant = new Merchant();
-                    merchant.setUserId(user.getUserId());
-                    merchant.setMerchantName("Unnamed");
-                    merchantService.insertMerchant(merchant);
-                }
-                case "customer" -> {
-                    Customer customer = new Customer();
-                    customer.setUserId(user.getUserId());
-                    customer.setCustomerName("Unnamed");
-                    customerService.insertCustomer(customer);
-                }
-            }
+    /**
+     * Creates a new user. This might be an admin-only function.
+     * (Corresponds to original POST /user)
+     * For user self-registration, use /auth/register.
+     */
+    @PostMapping
+    public Result createUser(@RequestBody User user) {
+        // Consider using a UserCreationRequestDTO
+        // Add validation if user already exists, etc., if not handled by DB constraints
+        int result = userService.insertUser(user);
+        if (result > 0) {
+            // Optionally return the created user (without sensitive data)
+            return Result.success("User created successfully.");
         } else {
-            return Result.error("Already exist!");
+            return Result.error("Failed to create user.");
         }
-        return Result.success();
     }
 
-    @PutMapping("/user")
-    public Result updateUser(@RequestBody User user) {
-        userService.updateUser(user);
-        return Result.success();
+    /**
+     * Updates an existing user's information.
+     * (Corresponds to original PUT /user)
+     */
+    @PutMapping("/{userId}")
+    public Result updateUser(@PathVariable String userId, @RequestBody User user) {
+        // Consider using a UserUpdateRequestDTO
+        // Ensure the client cannot update certain fields (e.g., role) unless authorized.
+        // It's good practice to set the ID from the path variable to avoid mismatches.
+        user.setUserId(userId);
+        int result = userService.updateUser(user);
+        if (result > 0) {
+            return Result.success("User updated successfully.");
+        } else {
+            return Result.error("Failed to update user or user not found.");
+        }
     }
 
-    @DeleteMapping("/user")
-    public Result deleteUserByUserId(@RequestBody User user) {
-        userService.deleteUserByUserId(user.getUserId());
-        return Result.success();
+    /**
+     * Deletes a user by their ID.
+     * (Corresponds to originally DELETE /user)
+     */
+    @DeleteMapping("/{userId}")
+    public Result deleteUser(@PathVariable String userId) {
+        int result = userService.deleteUserByUserId(userId);
+        if (result > 0) {
+            return Result.success("User deleted successfully.");
+        } else {
+            return Result.error("Failed to delete user or user not found.");
+        }
     }
 }

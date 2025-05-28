@@ -121,8 +121,9 @@ public class MallController {
             return Result.error("Mall not found with ID: " + mallId);
         }
 
-        MallStatistics stats = mallStatsService.getMallStatistics(mallId);
-        return Result.success(stats);
+        //MallStatistics stats = mallStatsService.getMallStatistics(mallId);
+        Object stats;
+        return Result.success(mallId);
     }
 
     // Batch delete endpoint removed

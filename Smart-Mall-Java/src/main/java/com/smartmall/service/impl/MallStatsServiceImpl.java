@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
-import java.util.Date;
+import java.sql.Date;
 
 /**
  * 商场统计业务Service实现
@@ -52,24 +52,31 @@ public class MallStatsServiceImpl implements MallStatsService {
 
     /**
      * Helper method to get the start of the current day.
+     * Returns java.sql.Date
      */
     private Date getStartOfToday() {
         Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
+        // 1. Use java.util.Date() to get the current timestamp
+        calendar.setTime(new java.util.Date());
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
-        return calendar.getTime();
+        // 2. Construct java.sql.Date from milliseconds for the return type
+        return new java.sql.Date(calendar.getTimeInMillis());
     }
 
     /**
      * Helper method to get the start of the next day.
+     * Returns java.sql.Date
      */
     private Date getStartOfTomorrow() {
         Calendar calendar = Calendar.getInstance();
+        // getStartOfToday() returns java.sql.Date.
+        // java.sql.Date is a subclass of java.util.Date, so calendar.setTime() accepts it.
         calendar.setTime(getStartOfToday());
         calendar.add(Calendar.DAY_OF_YEAR, 1);
-        return calendar.getTime();
+        // Construct java.sql.Date from milliseconds for the return type
+        return new java.sql.Date(calendar.getTimeInMillis());
     }
 }
