@@ -42,6 +42,14 @@ public interface UserMapper {
             """)
     public List<User> selectUserByUserName(User user);
 
+    @Select("""
+                        select user_id, username, password, role, phone, email, created_at, updated_at
+                        from users
+                        where user_id = #{userId};
+            """)
+
+    public User selectUserByUserId(User user);
+
     /**
      * 查询用户 (User Table)列表
      *

@@ -19,7 +19,7 @@ public class UserController {
      * Retrieves a list of all users.
      * (Corresponds to original /find-all)
      */
-    @GetMapping
+    @GetMapping("/find-all")
     public Result getAllUsers() {
         List<User> userList = userService.findAll();
         // Consider using a DTO that excludes sensitive information like passwords
@@ -31,14 +31,16 @@ public class UserController {
      * (Corresponds to original GET /user)
      * Example: /users/search?username=john&role=customer
      */
-    @GetMapping("/search")
-    public Result searchUsers(User filter) { // Spring populates 'filter' from query parameters
+    @GetMapping("/{userId}")
+    public Result getUserById(@PathVariable String userId) { // Spring populates 'filter' from query parameters
         // The User object will have fields set if they are present in the query string.
         // Be mindful of the UserMapper.selectUserList query which uses OR and includes password.
         // Searching by password in GET query parameters is highly discouraged.
-        List<User> userList = userService.selectUserList(filter);
+        System.out.println(userId);
+        User user =new User();
+        user.setUserId(userId);
         // Consider using a DTO
-        return Result.success(userList);
+        return Result.success(userService.selectUserByUserId(user));
     }
 
     /**

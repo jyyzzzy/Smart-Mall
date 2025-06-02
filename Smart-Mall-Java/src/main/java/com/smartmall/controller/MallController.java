@@ -111,19 +111,32 @@ public class MallController {
 
     /**
      * 获取指定商场的统计数据
-     * Includes total merchants, total products, and today's orders count.
+     * 包括总商户数、总商品数和今日订单数。
      */
     @GetMapping("/{mallId}/stats")
     public Result getMallStatistics(@PathVariable String mallId) {
-        // Optional: Validate if the mallId exists before fetching stats
+        // 1. 验证 mallId 是否有效 (可选，但推荐)
         Mall mall = mallService.selectMallById(mallId);
         if (mall == null) {
-            return Result.error("Mall not found with ID: " + mallId);
+            return Result.error("未找到ID为 " + mallId + " 的商场");
         }
 
-        //MallStatistics stats = mallStatsService.getMallStatistics(mallId);
-        Object stats;
-        return Result.success(mallId);
+        // 2. 从 MallStatsService 获取统计数据
+        // 假设 MallStatsService 有一个 getMallStatistics 方法返回 MallStatistics 对象
+        // MallStatistics 对象应包含 merchantCount, productCount, todayOrderCount 等字段
+        try {
+            MallStatistics stats = mallStatsService.getMallStatistics(mallId);
+            if (stats != null) {
+                return Result.success(stats);
+            } else {
+                // 如果 stats 为 null，可能表示没有统计数据或获取失败
+                return Result.error("无法获取ID为 " + mallId + " 的商场统计数据");
+            }
+        } catch (Exception e) {
+            // 处理获取统计数据时可能发生的任何异常
+            // log.error("获取商场统计数据时出错 mallId: {}: {}", mallId, e.getMessage()); // 假设有日志记录器
+            return Result.error("获取商场统计数据时发生内部错误");
+        }
     }
 
     // Batch delete endpoint removed

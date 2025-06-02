@@ -66,7 +66,7 @@ public interface MerchantMapper {
      */
     @Insert("""
             INSERT INTO merchants (merchant_id, user_id, mall_id, merchant_name, contact_phone, contact_email, address)
-            VALUES (UUID(), #{userId}, #{mallId}, #{merchantName}, #{contactPhone}, #{contactEmail}, #{address});
+            VALUES (UUID(), #{userId}, '0', #{merchantName}, #{contactPhone}, #{contactEmail}, #{address});
             """)
     int insertMerchant(Merchant merchant);
 

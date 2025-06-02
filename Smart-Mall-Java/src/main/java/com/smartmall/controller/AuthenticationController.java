@@ -31,14 +31,15 @@ public class AuthenticationController {
      * Input: User credentials (username, password) in the request body.
      * Output: User details on success, or an error message.
      */
-    @PostMapping("/login") // Changed from GET to POST as login typically involves sending credentials in the body
-    public Result login(@RequestBody User credentials) { // Renamed parameter for clarity
+    @GetMapping("/login") // Changed from GET to POST as login typically involves sending credentials in the body
+    public Result login(User credentials) { // Renamed parameter for clarity
         // It's better to use a specific DTO like LoginRequestDTO here with only username and password
         User userToAuthenticate = new User();
         userToAuthenticate.setUsername(credentials.getUsername());
         userToAuthenticate.setPassword(credentials.getPassword());
 
         List<User> userList = userService.selectUserByUserNameAndPassword(userToAuthenticate);
+        System.out.println(userList);
         if (userList != null && !userList.isEmpty()) {
             // Consider returning a JWT or session token instead of the full User object
             // Also, ensure the password field is not part of the returned User object here
@@ -63,7 +64,7 @@ public class AuthenticationController {
             // Critical: Ensure userId is generated and available if needed by subsequent logic.
             // The original code had a potential issue here if userId is DB-generated
             // and not refreshed in the 'user' object before creating related entities.
-            // Assuming insertUser populates the userId or it's handled correctly:
+            // Assuming insertUser populates the userId, or it's handled correctly:
             int insertResult = userService.insertUser(user);
 
             if (insertResult > 0) {

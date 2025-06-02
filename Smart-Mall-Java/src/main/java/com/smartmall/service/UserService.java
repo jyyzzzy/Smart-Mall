@@ -22,6 +22,8 @@ public interface UserService {
      */
     public List<User> selectUserByUserName(User user);
 
+    public User selectUserByUserId(User user);
+
     public List<User> selectUserByUserNameAndPassword(User user);
 
     /**
