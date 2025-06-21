@@ -46,7 +46,7 @@ public class CustomerController {
         List<Customer> customerList = customerService.selectCustomerByUserId(userId);
         if (customerList != null && !customerList.isEmpty()) {
             // Returning the first one if multiple exist, or adjust business logic
-            return Result.success(customerList.getFirst());
+            return Result.success(customerList.get(0));
         } else {
             return Result.error("Customer profile not found for User ID: " + userId);
         }

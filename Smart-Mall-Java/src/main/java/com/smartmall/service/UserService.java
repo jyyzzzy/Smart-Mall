@@ -34,6 +34,10 @@ public interface UserService {
      */
     public List<User> selectUserList(User user);
 
+    User findByUsername(String username);
+
+    boolean exists(String username);
+
     /**
      * 新增用户 (User Table)
      *
