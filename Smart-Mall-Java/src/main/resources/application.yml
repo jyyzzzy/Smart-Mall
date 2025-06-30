@@ -6,13 +6,17 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     password: Root@12345678
     username: root
-
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
 mybatis:
   configuration:
     map-underscore-to-camel-case: true
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-
+wechat:
+  appid:  wxfd3e2415330ac983
+  secret: abbba581442d9c95ea25a11907730bc3
 jwt:
   secret: h2mPp9lbITbEk6H8q1N7LgqYIHDvX7PFwGsSWfKJH2c=
-  access-ttl-ms: 900000
-  refresh-ttl-ms: 604800000
+

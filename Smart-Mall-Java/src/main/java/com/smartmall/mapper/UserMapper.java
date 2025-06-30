@@ -6,104 +6,76 @@ import org.apache.ibatis.annotations.*;
 import java.util.List;
 
 /**
- * 用户 (User Table)Mapper接口
- *
- * @author ccut_zzy
- * @date 2025-04-08
+ * UserMapper ‑ 基于 MyBatis 的用户表操作接口。
+ * ▶ 新增 findByUsername / countByUsername，配合 BCrypt 不再按明文密码查询。
+ * ▶ insertUser 支持 useGeneratedKeys 自动回填 userId。
  */
 @Mapper
 public interface UserMapper {
-    @Select("select * from users")
-    public List<User> findAll();
 
-    /**
-     * 查询用户 (User Table)
-     *
-     * @param user 用户 (User Table)主键
-     * @return 用户 (User Table)
-     */
+    /* ==================== 查询 ==================== */
+    @Select("SELECT user_id, username, password, role, phone, email, created_at, updated_at FROM users")
+    List<User> findAll();
+
+    /** 根据用户名查单条 */
+    @Select("SELECT user_id, username, password, role, phone, email, created_at, updated_at FROM users WHERE username = #{username}")
+    User findByUsername(String username);
+
+    /** 判断重名 */
+    @Select("SELECT COUNT(1) FROM users WHERE username = #{username}")
+    int countByUsername(String username);
+
+    /** 按条件模糊查询（保留旧接口，可逐步迁移） */
     @Select("""
-                        select user_id, username, password, role, phone, email, created_at, updated_at
-                        from users
-                        where username = #{username} and password = #{password};
+            SELECT user_id, username, password, role, phone, email, created_at, updated_at
+            FROM users
+            WHERE (#{userId} IS NULL OR user_id = #{userId})
+              AND (#{username} IS NULL OR username = #{username})
+              AND (#{role} IS NULL OR role = #{role})
             """)
-    public List<User> selectUserByUserNameAndPassword(User user);
+    List<User> selectUserList(User user);
 
-    /**
-     * 查询用户 (User Table)
-     *
-     * @param user 用户 (User Table)主键
-     * @return 用户 (User Table)
-     */
-    @Select("""
-                        select user_id, username, password, role, phone, email, created_at, updated_at
-                        from users
-                        where username = #{username};
-            """)
-    public List<User> selectUserByUserName(User user);
-
-    @Select("""
-                        select user_id, username, password, role, phone, email, created_at, updated_at
-                        from users
-                        where user_id = #{userId};
-            """)
-
-    public User selectUserByUserId(User user);
-
-    /**
-     * 查询用户 (User Table)列表
-     *
-     * @param user 用户 (User Table)
-     * @return 用户 (User Table)集合
-     */
-    @Select("""
-            select user_id, username, password, role, phone, email, created_at, updated_at
-            from users
-            where user_id = #{userId} or username = #{username} or password = #{password} or role = #{role};
-            """)
-    public List<User> selectUserList(User user);
-
-    /**
-     * 新增用户 (User Table)
-     *
-     * @param user 用户 (User Table)
-     * @return 结果
-     */
+    /* ==================== 新增 / 修改 / 删除 ==================== */
     @Insert("""
             INSERT INTO users (user_id, username, password, role, phone, email, created_at, updated_at)
-            VALUES (UUID(), #{username}, #{password}, #{role}, #{phone}, #{email}, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP());
+            VALUES (UUID(), #{username}, #{password}, #{role}, #{phone}, #{email}, NOW(), NOW())
             """)
-    public int insertUser(User user);
+    @Options(useGeneratedKeys = true, keyProperty = "userId")
+    int insertUser(User user);
 
-    /**
-     * 修改用户 (User Table)
-     *
-     * @param user 用户 (User Table)
-     * @return 结果
-     */
     @Update("""
             UPDATE users
-            SET username = #{username}, password = #{password},  role = #{role}, phone = #{phone}, email = #{email}, updated_at = CURRENT_TIMESTAMP
-            WHERE user_id = #{userId};
+               SET username = #{username},
+                   password = #{password},
+                   role     = #{role},
+                   phone    = #{phone},
+                   email    = #{email},
+                   updated_at = NOW()
+             WHERE user_id = #{userId}
             """)
-    public int updateUser(User user);
+    int updateUser(User user);
 
-    /**
-     * 删除用户 (User Table)
-     *
-     * @param userId 用户 (User Table)主键
-     * @return 结果
-     */
-    @Delete("""
-            DELETE FROM users where user_id = #{userId};
-            """)
-    public int deleteUserByUserId(String userId);
+    @Delete("DELETE FROM users WHERE user_id = #{userId}")
+    int deleteUserByUserId(String userId);
 
-    /**
-     * 批量删除用户 (User Table)
-     *
-     * @param userIds 需要删除的数据主键集合
-     * @return 结果
-     */
-    //public int deleteUserByUserIds(String[] userIds);
+    /* ==================== 兼容旧方法 ==================== */
+    @Deprecated
+    default List<User> selectUserByUserName(User user) {
+        return List.of(findByUsername(user.getUsername()));
+    }
+
+    @Deprecated
+    default List<User> selectUserByUserNameAndPassword(User user) {
+        // BCrypt 无法直接 SQL 比对密码，保持空实现避免编译错；应在 Service 层使用 matches()
+        return List.of();
+    }
+
+    @Deprecated
+    default User selectUserByUserId(User user) {
+        return findById(user.getUserId());
+    }
+
+    /* 私有辅助 */
+    @Select("SELECT user_id, username, password, role, phone, email, created_at, updated_at FROM users WHERE user_id = #{id}")
+    User findById(String id);
 }
